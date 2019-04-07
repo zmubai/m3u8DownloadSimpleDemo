@@ -88,11 +88,13 @@ static int avCount = 0;
             dispatch_async(dispatch_get_main_queue(), ^{
                 label.text = [NSString stringWithFormat:@"%0.2f%%",progress * 100];
             });
-        } downloadSuccessBlock:^(NSString *localPlayUrlString) {
-            [[ZBLM3u8Manager shareInstance]  tryStartLocalService];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self playWithUrlString:localPlayUrlString];
-            });
+        } downloadResultBlock:^(NSString * _Nonnull localPlayUrlString, NSError * _Nullable error) {
+            if (!error) {
+                [[ZBLM3u8Manager shareInstance]  tryStartLocalService];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self playWithUrlString:localPlayUrlString];
+                });
+            }
         }];
     }
 }

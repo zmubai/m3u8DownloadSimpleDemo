@@ -57,7 +57,7 @@
     return  [NSString stringWithFormat:@"%@/%@/%@",[ZBLM3u8Setting localHost],[ZBLM3u8Setting uuidWithUrl:urlString],[ZBLM3u8Setting m3u8InfoFileName]];
 }
 
-- (void)downloadVideoWithUrlString:(NSString *)urlStr downloadProgressHandler:(ZBLM3u8ManagerDownloadProgressHandler)downloadProgressHandler downloadSuccessBlock:(ZBLM3u8ManagerDownloadSuccessBlock) downloadSuccessBlock
+- (void)downloadVideoWithUrlString:(NSString *)urlStr downloadProgressHandler:(ZBLM3u8ManagerDownloadProgressHandler)downloadProgressHandler downloadResultBlock:(ZBLM3u8ManagerDownloadResultBlock) downloadResultBlock
 {
     dispatch_async(_downloadQueue, ^{
         __weak __typeof(self) weakself = self;
@@ -70,10 +70,15 @@
                 [weakself.downloadContainerDictionary removeObjectForKey:[ZBLM3u8Setting uuidWithUrl:urlStr]];
                 [weakself _unlock];
                 NSLog(@"下载完成:%@",urlStr);
-                downloadSuccessBlock(locaLUrl);
+                if (downloadResultBlock) {
+                    downloadResultBlock(locaLUrl,nil);
+                }
             }
             else
             {
+                if (downloadResultBlock) {
+                    downloadResultBlock(nil,error);
+                }
                 NSLog(@"下载失败:%@",error);
             }
 #ifdef DEBUG
