@@ -50,7 +50,8 @@ NSString * const ZBLM3u8DownloadContainerGreateRootDirErrorDomain = @"error.m3u8
     _downloadProgressHandler = downloadProgressHandler;
     if(![self tryCreateRootDir])
     {
-        _completaionHandler(nil,[[NSError alloc]initWithDomain:ZBLM3u8DownloadContainerGreateRootDirErrorDomain code:NSURLErrorCannotCreateFile userInfo:nil]);
+        if(_completaionHandler)
+            _completaionHandler(nil,[[NSError alloc]initWithDomain:ZBLM3u8DownloadContainerGreateRootDirErrorDomain code:NSURLErrorCannotCreateFile userInfo:nil]);
         return;
     }
     [ZBLM3u8Analysiser analysisWithUrlString:urlStr completaionHandler:^(ZBLM3u8Info *m3u8Info, NSError *error) {
@@ -60,8 +61,11 @@ NSString * const ZBLM3u8DownloadContainerGreateRootDirErrorDomain = @"error.m3u8
         }
         else
         {
-            self.completaionHandler(nil,error);
-            NSLog(@"error:%@",error.description);
+            if(self.completaionHandler)
+            {
+                self.completaionHandler(nil,error);
+                NSLog(@"error:%@",error.description);
+            }
         }
     }];
 }
@@ -84,7 +88,8 @@ NSString * const ZBLM3u8DownloadContainerGreateRootDirErrorDomain = @"error.m3u8
         }
         else
         {
-            weakself.completaionHandler(nil,error);
+            if(weakself.completaionHandler)
+                weakself.completaionHandler(nil,error);
         }
     } downloadQueue:nil];
     if (_downloadProgressHandler) {
@@ -134,12 +139,13 @@ NSString * const ZBLM3u8DownloadContainerGreateRootDirErrorDomain = @"error.m3u8
     __weak __typeof(self) weakself = self;
     NSString *m3u8info = [ZBLM3u8Analysiser synthesisLocalM3u8Withm3u8Info:self.m3u8Info];
     [[ZBLM3u8FileManager shareInstance] saveDate:[m3u8info dataUsingEncoding:NSUTF8StringEncoding] ToFile:[[ZBLM3u8Setting fullCommonDirPrefixWithUrl:_m3u8OriUrl] stringByAppendingPathComponent:[ZBLM3u8Setting m3u8InfoFileName]] completaionHandler:^(NSError *error) {
+        if(!weakself.completaionHandler) return;
         if (!error) {
             weakself.completaionHandler([NSString stringWithFormat:@"%@/%@/%@",[ZBLM3u8Setting localHost],[ZBLM3u8Setting uuidWithUrl:self.m3u8OriUrl],[ZBLM3u8Setting m3u8InfoFileName]],nil);
         }
         else
         {
-            weakself.completaionHandler(nil,error);
+                weakself.completaionHandler(nil,error);
         }
     }];
 }
