@@ -60,7 +60,7 @@ downloadResultBlock:(ZBLM3u8ManagerDownloadResultBlock) downloadResultBlock;
 #pragma mark - dir/fileName
 + (NSString *)commonDirPrefix
 {
-    return  [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES) objectAtIndex:0] stringByAppendingPathComponent:@"m3u8files"];
+    return  [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory,NSUserDomainMask,YES) objectAtIndex:0] stringByAppendingPathComponent:@"m3u8files"];
 }
 + (NSString *)m3u8InfoFileName
 {
