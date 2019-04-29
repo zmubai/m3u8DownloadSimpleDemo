@@ -78,6 +78,7 @@ static int avCount = 0;
 
     /*
      1. 索引文件url，如果其返回内容的是一级m3u8文件（多码流适配的），那么会下载失败，需要选定一个码率的二级索引文件url才能正确下载。
+     相关参考：https://www.cnblogs.com/shakin/p/3870439.html
 
      2. 可以调试ZBLM3u8Analysiser类相关方法查看url返回的文件内容
      ///方法
@@ -105,7 +106,6 @@ static int avCount = 0;
 
      http://example.com/audio-only.m3u8
      --------------end------------
-
      */
     self.urlArr = @[@"https://bitmovin-a.akamaihd.net/content/playhouse-vr/m3u8s/105560_video_360_1000000.m3u8",
                         @"https://bitmovin-a.akamaihd.net/content/playhouse-vr/m3u8s/105560_video_540_1500000.m3u8",
