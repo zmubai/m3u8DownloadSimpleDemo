@@ -7,10 +7,11 @@
 //
 
 #import "ViewController.h"
-#import "ZBLM3u8Manager.h"
-#import "ZBLM3u8Manager.h"
 #import <AVKit/AVKit.h>
 #import <AVFoundation/AVFoundation.h>
+#import "ZBLM3u8Setting.h"
+#import "ZBLHttpLocalServer.h"
+#import "ZBLM3u8Manager.h"
 
 @interface ViewController ()
 @property (strong, nonatomic) AVPlayer *player;
@@ -51,6 +52,10 @@
     [clearBtn setTitle:@"clearRootPath" forState:UIControlStateNormal];
     [clearBtn addTarget:self action:@selector(clearRootPath) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:clearBtn];
+
+    /*配置本地server*/
+    ZBLHttpLocalServer.shareInstance.documentRoot = [ZBLM3u8Setting commonDirPrefix];
+    ZBLHttpLocalServer.shareInstance.port = [ZBLM3u8Setting port].integerValue;
 }
 static int avCount = 0;
 - (void)start
@@ -69,6 +74,39 @@ static int avCount = 0;
     self.progressView = [[UIScrollView alloc]initWithFrame:CGRectMake(0, 90, self.view.bounds.size.width, 40)];
     self.progressView.backgroundColor = [UIColor grayColor];
     [self.view addSubview:self.progressView];
+
+
+    /*
+     1. 索引文件url，如果其返回内容的是一级m3u8文件（多码流适配的），那么会下载失败，需要选定一个码率的二级索引文件url才能正确下载。
+
+     2. 可以调试ZBLM3u8Analysiser类相关方法查看url返回的文件内容
+     ///方法
+     + (void)analysisWithUrlString:(NSString*)urlStr completaionHandler:(ZBLM3u8AnalysiseCompletaionHandler)completaionHandler
+     //具体语句
+     NSString *oriM3u8String = [NSString stringWithContentsOfFile:[[ZBLM3u8Setting fullCommonDirPrefixWithUrl:urlStr] stringByAppendingPathComponent:[ZBLM3u8Setting oriM3u8InfoFileName]] encoding:0 error:nil];
+
+     3. 一级文件参照：
+     --------------start------------
+     #EXTM3U
+
+     #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1280000
+
+     http://example.com/low.m3u8
+
+     #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=2560000
+
+     http://example.com/mid.m3u8
+
+     #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=7680000
+
+     http://example.com/hi.m3u8
+
+     #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=65000,CODECS="mp4a.40.5"
+
+     http://example.com/audio-only.m3u8
+     --------------end------------
+
+     */
     self.urlArr = @[@"https://bitmovin-a.akamaihd.net/content/playhouse-vr/m3u8s/105560_video_360_1000000.m3u8",
                         @"https://bitmovin-a.akamaihd.net/content/playhouse-vr/m3u8s/105560_video_540_1500000.m3u8",
                         @"https://bitmovin-a.akamaihd.net/content/playhouse-vr/m3u8s/105560_video_720_3000000.m3u8",
@@ -90,7 +128,8 @@ static int avCount = 0;
             });
         } downloadResultBlock:^(NSString * _Nonnull localPlayUrlString, NSError * _Nullable error) {
             if (!error) {
-                [[ZBLM3u8Manager shareInstance]  tryStartLocalService];
+                /*启动本地server*/
+                [[ZBLHttpLocalServer shareInstance]  tryStart];
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [self playWithUrlString:localPlayUrlString];
                 });

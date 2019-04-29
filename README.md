@@ -2,6 +2,7 @@
 #### 使用方法
 1.发起下载
 ``` 
+//urlStr必须为二级索引文件url，不能为多码流选择的一级索引文件rul
 - (void)downloadVideoWithUrlString:(NSString *)urlStr
 downloadProgressHandler:(ZBLM3u8ManagerDownloadProgressHandler)downloadProgressHandler
 downloadResultBlock:(ZBLM3u8ManagerDownloadResultBlock) downloadResultBlock;
@@ -30,9 +31,13 @@ downloadResultBlock:(ZBLM3u8ManagerDownloadResultBlock) downloadResultBlock;
 
 3.http服务控制
 ```
-- (void)tryStartLocalService;
-
-- (void)tryStopLocalService;
+@interface ZBLHttpLocalServer : NSObject
+@property (strong, nonatomic) NSString *documentRoot;
+@property (assign, nonatomic) NSInteger port;
++ (instancetype)shareInstance;
+- (void)tryStart;
+- (void)tryStop;
+@end
 ```
 
 4.url文件相关

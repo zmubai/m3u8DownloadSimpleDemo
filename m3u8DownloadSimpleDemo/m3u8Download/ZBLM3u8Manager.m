@@ -8,14 +8,12 @@
 
 #import "ZBLM3u8Manager.h"
 #import "ZBLM3u8FileManager.h"
-#import "HTTPServer.h"
 #import "ZBLM3u8Setting.h"
 #import "ZBLM3u8DownloadContainer.h"
 
 @interface ZBLM3u8Manager ()
 @property (nonatomic, strong) NSMutableDictionary *downloadContainerDictionary;
 @property (nonatomic, strong) dispatch_queue_t downloadQueue;
-@property (strong, nonatomic) HTTPServer *httpServer;
 @property (nonatomic, strong) dispatch_semaphore_t lock;
 @end
 
@@ -110,38 +108,4 @@
     }
     return dc;
 }
-
-#pragma mark - service
-- (void)tryStartLocalService
-{
-    /*多线程不可重入*/
-    @synchronized (self) {
-        if (!self.httpServer) {
-            self.httpServer=[[HTTPServer alloc]init];
-            [self.httpServer setType:@"_http._tcp."];
-            [self.httpServer setPort:[ZBLM3u8Setting port].integerValue];
-            [self.httpServer setDocumentRoot:[ZBLM3u8Setting commonDirPrefix]];
-            NSError *error;
-            if ([self.httpServer start:&error]) {
-                NSLog(@"开启HTTP服务器 端口:%hu",[self.httpServer listeningPort]);
-            }
-            else{
-                NSLog(@"服务器启动失败错误为:%@",error);
-            }
-        }
-        else if(!self.httpServer.isRunning)
-        {
-            [self.httpServer start:nil];
-        }
-    }
-}
-
-- (void)tryStopLocalService
-{
-    @synchronized (self) {
-        if([self.httpServer isRunning])
-            [self.httpServer stop:YES];
-    }
-}
-
 @end

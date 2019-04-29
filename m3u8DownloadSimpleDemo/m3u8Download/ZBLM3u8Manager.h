@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^ZBLM3u8ManagerDownloadResultBlock)(NSString *localPlayUrlString,  NSError * _Nullable error);
+typedef void (^ZBLM3u8ManagerDownloadResultBlock)(NSString * _Nullable localPlayUrlString,  NSError * _Nullable error);
 typedef void (^ZBLM3u8ManagerDownloadProgressHandler)(float progress);
 @interface ZBLM3u8Manager : NSObject
 + (instancetype)shareInstance;
@@ -26,10 +26,6 @@ typedef void (^ZBLM3u8ManagerDownloadProgressHandler)(float progress);
                downloadResultBlock:(ZBLM3u8ManagerDownloadResultBlock) downloadResultBlock;
 
 - (void)cannelDownloadWithUrl:(NSString *)url;
-
-- (void)tryStartLocalService;
-
-- (void)tryStopLocalService;
 @end
 
 NS_ASSUME_NONNULL_END

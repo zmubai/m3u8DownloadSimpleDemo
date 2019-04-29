@@ -39,7 +39,7 @@ NSString * const ZBLM3u8FileManagerWriteErrorDomain = @"error.m3u8.fileManager.w
     if (self) {
         _ioQueue = ioQueue != nil ? ioQueue : dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);
         dispatch_sync(_ioQueue, ^{
-            _fileManager = [NSFileManager new];
+            self.fileManager = [NSFileManager new];
         });
     }
     return self;
@@ -102,7 +102,7 @@ NSString * const ZBLM3u8FileManagerWriteErrorDomain = @"error.m3u8.fileManager.w
 {
     dispatch_sync(_ioQueue, ^{
         NSError *error = nil;
-        [_fileManager moveItemAtURL:srcURL toURL:dstURL error:&error];
+        [self.fileManager moveItemAtURL:srcURL toURL:dstURL error:&error];
         if (completaionHandler) {
             completaionHandler(error);
         }
@@ -112,16 +112,16 @@ NSString * const ZBLM3u8FileManagerWriteErrorDomain = @"error.m3u8.fileManager.w
 - (void)removeFileWithPath:(NSString *)path
 {
     dispatch_sync(_ioQueue, ^{
-        [_fileManager removeItemAtPath:path error:nil];
+        [self.fileManager removeItemAtPath:path error:nil];
     });
 }
 
 - (void)tryCreateDictionaryWithPath:(NSString*)path completaionHandler:(ZBLM3u8FileManagerCompletaionHandler)completaionHandler
 {
-    if ([_fileManager fileExistsAtPath:path]) completaionHandler(nil);
+    if ([self.fileManager fileExistsAtPath:path]) completaionHandler(nil);
     
     NSError *error = nil;
-    [_fileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:&error];
+    [self.fileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:&error];
     if (completaionHandler) {
         completaionHandler(error);
     }
