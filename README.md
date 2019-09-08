@@ -1,3 +1,9 @@
+#### 使用operation实现的版本(推荐)
+支持媒体并发控制，支持单个媒体文件并发控制。支持任务取消，支持任务挂起和恢复。
+
+地址：[https://github.com/zmubai/M3U8DemoByOperation.git](https://github.com/zmubai/M3U8DemoByOperation.git)
+
+
 ###  m3u8缓存本地播放
 #### 使用方法
 1.发起下载
@@ -94,3 +100,4 @@ downloadResultBlock:(ZBLM3u8ManagerDownloadResultBlock) downloadResultBlock;
     return [NSString stringWithFormat:@"%@.ts",identify];
 }
 ```
+
